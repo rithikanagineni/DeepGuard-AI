@@ -3,9 +3,9 @@
 
 **Detecting Digital Deception. Building Digital Trust.**
 
-DeepGuard AI is an AI-assisted media analysis platform designed to identify potentially manipulated images and videos using computer vision, deep learning, and machine learning techniques.
+DeepGuard AI is an AI-assisted media analysis platform designed to screen images and videos for potentially manipulated facial content using computer vision, deep learning, and machine learning techniques.
 
-The system uses **MobileNetV2 for feature extraction** and an **SVM classifier** to analyze facial content and classify it as Real or Fake. It also provides a user-friendly interface for media analysis, visualization of results, analytics, and downloadable reports.
+The system uses **MobileNetV2 for feature extraction** and an **RBF-kernel SVM classifier**. Results are reported as **Real**, **Fake**, or **Needs Review**; they are an automated screening assessment, not proof of authenticity or manipulation.
 
 ---
 
@@ -25,7 +25,8 @@ DeepGuard AI aims to provide an accessible platform that analyzes uploaded media
 - Extract meaningful visual features using MobileNetV2.
 - Classify extracted features using an SVM model.
 - Display understandable detection results and analysis statistics.
-- Maintain analysis history and provide downloadable reports.
+- Explain which implemented signals were available for each result without presenting unavailable measurements as evidence.
+- Maintain browser-local analysis history and provide downloadable forensic reports.
 
 ---
 
@@ -37,8 +38,9 @@ DeepGuard AI aims to provide an accessible platform that analyzes uploaded media
 - Provides access to different application modules.
 
 ### 2. Media Analyzer
-- Supports uploading image and video files.
-- Allows users to preview uploaded media.
+- Supports uploading image and video files and previews them before analysis.
+- Displays available file details, image/video dimensions, and video duration.
+- Calculates a SHA-256 fingerprint in the browser for files up to 100 MB; this is a file identifier, not a manipulation detector.
 - Initiates the AI-based detection process.
 - Processes media through the detection pipeline.
 
@@ -47,28 +49,39 @@ DeepGuard AI aims to provide an accessible platform that analyzes uploaded media
 - Extracts facial regions from sampled video frames.
 - Uses MobileNetV2 for deep feature extraction.
 - Applies an RBF-kernel SVM classifier.
-- Generates Real/Fake assessments.
+- Generates Real, Fake, or Needs Review assessments.
+- Uses the image result directly and combines usable sampled-frame scores for video results.
+- Reviews at most 20 evenly spaced video frames.
 
 ### 4. Detection Results
 - Displays the classification assessment.
-- Presents the model score.
-- Provides video-related analysis statistics.
-- Combines sampled frame-level outputs into a video-level assessment.
+- Presents the bounded Fake-class model score; it is derived from the SVM decision function and is not a calibrated probability.
+- Provides available face-detection, frame, and file statistics.
+- Shows a “Why this result?” evidence summary. Signals that are not calculated are marked “Not analyzed.”
+- Uses Needs Review for image scores from 0.45 through 0.55 inclusive, images without a detectable face, and videos with fewer than three usable sampled face scores.
 
-### 5. Analytics Dashboard
-- Displays analysis totals.
-- Shows Real/Fake classification distribution.
-- Provides access to recent analysis history.
-- Helps users understand the analysis activity.
+### 5. Video Frame Investigation
+- Displays a clickable timeline for sampled frames, with timestamp, face-detection status, frame assessment, score, and the implementation's suspicion label.
+- Shows a selected sampled frame and its face crop when available.
+- The suspicion label is a simple mapping from the frame assessment, not a separate forensic model.
 
-### 6. Methodology Section
+### 6. Media Forensics and Reports
+- Shows available file and analysis details, including dimensions, duration/FPS for videos, frame counts, and model scores.
+- Generates a downloadable HTML forensic report with the result, analysis summary, sampled-frame table, model information, and limitations.
+- Embedded EXIF metadata, provenance, lighting/shadows, blending boundaries, and pixel/texture artifacts are not analyzed.
+- Metadata note: metadata can provide context but does not by itself prove whether media is authentic.
+
+### 7. Analytics Dashboard
+- Summarizes analyses, assessment categories, and available model-score and video-frame statistics with charts and recent-history views.
+- Keeps the latest 100 analysis records in the current browser's local storage. History is not shared or synchronized across users or devices.
+
+### 8. Methodology Section
 - Explains the dataset used.
 - Describes preprocessing techniques.
-- Presents the model architecture and detection workflow.
+- Presents the model architecture, held-out video evaluation metrics, and confusion matrix.
 
-### 7. Downloadable Reports
-- Generates a downloadable summary of an analysis.
-- Helps users retain and review detection information.
+### Signals not implemented
+The application does not calculate facial-landmark consistency, texture/pixel irregularities, face-boundary blending, lighting/shadow consistency, embedded metadata/provenance, or learned temporal motion consistency. These are not represented as analyzed evidence.
 
 ---
 
@@ -108,8 +121,8 @@ DeepGuard AI follows a sequential media-processing and classification pipeline.
        Video-Level Aggregation
                |
                v
-        Detection Result
-          REAL / FAKE
+        Assessment
+ REAL / FAKE / NEEDS REVIEW
                |
                v
        Analytics and Reports
@@ -148,8 +161,12 @@ The sampled frame-level outputs are combined to generate a video-level assessmen
 6. Normalize the image data.
 7. Extract features using MobileNetV2.
 8. Pass the extracted features to the trained SVM classifier.
-9. Combine frame-level predictions for video assessment.
-10. Display the result through the application.
+9. Convert the SVM decision function to a bounded display score using a sigmoid. This score is not calibrated as a probability.
+10. For video, aggregate usable sampled face scores using their median; require at least three usable sampled face scores, otherwise return Needs Review.
+11. Return Needs Review for image scores in the inclusive 0.45–0.55 band or when no face is detected.
+12. Display the result and the evidence actually available for that analysis.
+
+Video analysis samples at most 20 frames. The frame-timeline suspicion label is based on the frame assessment; it is not an independent model output. Evidence strength is a rule-based coverage summary, not a calibrated confidence measure.
 
 ---
 
@@ -165,7 +182,7 @@ The sampled frame-level outputs are combined to generate a video-level assessmen
 |---|---:|
 | Original videos | 50 |
 | Manipulated videos | 50 |
-| Frames sampled per video | 10 |
+| Frames sampled per video during preprocessing | Up to 10 |
 | Processed Real frames | 497 |
 | Processed Fake frames | 497 |
 | Total processed frames | 994 |
@@ -192,12 +209,15 @@ Dataset access and usage should follow the applicable FaceForensics++ terms and 
 | Frontend | HTML, CSS, JavaScript |
 | Backend Framework | FastAPI |
 | Computer Vision | OpenCV |
-| Deep Learning | MobileNetV2 |
-| Machine Learning | Support Vector Machine |
+| Deep Learning | TensorFlow / Keras MobileNetV2 |
+| Machine Learning | scikit-learn Support Vector Machine |
+| Data processing | NumPy, pandas |
 | Dataset | FaceForensics++ |
 | Classification Kernel | RBF Kernel |
+| API server | Uvicorn |
+| Training/evaluation plots | Matplotlib |
 
-**Additional libraries:** Include the exact dependencies used in your implementation in `requirements.txt`.
+The runtime model artifact is `models/deepfake_cnn_svm_rigorous.pkl`. MobileNetV2 uses ImageNet weights, which Keras may need to download the first time the application starts.
 
 ---
 
@@ -227,7 +247,7 @@ The current model was evaluated using a held-out video-level test set.
 | Real | 7 | 3 |
 | Fake | 3 | 7 |
 
-These results represent the current held-out test set only. They do not guarantee equivalent performance on unseen datasets or real-world media.
+Evaluation was performed on the held-out video-level test set (20 videos: 10 Real and 10 Fake). These project-specific results do not guarantee equivalent performance on unseen datasets or real-world media.
 
 ---
 
@@ -237,10 +257,12 @@ These results represent the current held-out test set only. They do not guarante
 |---|---|
 | Dashboard | Application overview and navigation |
 | Media Analyzer | Media upload, preview and analysis |
-| Detection Result | Classification assessment, score and video statistics |
-| Analytics | Analysis totals, classification distribution and recent history |
-| Methodology | Dataset, preprocessing and model explanation |
-| Report | Downloadable analysis summary |
+| Detection Result | Real/Fake/Needs Review assessment, bounded model score, available evidence, and video statistics |
+| Frame Investigation | Interactive timeline of up to 20 sampled video frames |
+| Media Forensics | Available file, media, and analysis details; metadata/provenance is not inspected |
+| Analytics | Browser-local analysis totals, assessment/score/frame charts, and recent history |
+| Methodology | Dataset, preprocessing, model explanation, held-out metrics, and confusion matrix |
+| Report | Downloadable HTML forensic analysis report |
 
 ---
 
@@ -248,7 +270,7 @@ These results represent the current held-out test set only. They do not guarante
 
 ### Prerequisites
 
-- Python 3.x
+- Python 3.10 (the project environment used for validation)
 - pip package manager
 - Git
 - A code editor such as Visual Studio Code
@@ -256,7 +278,7 @@ These results represent the current held-out test set only. They do not guarante
 ### Step 1: Clone the Repository
 
 ```bash
-git clone YOUR_GITHUB_REPOSITORY_URL
+git clone https://github.com/rithikanagineni/DeepGuard-AI.git
 ```
 
 ### Step 2: Navigate to the Project
@@ -280,58 +302,23 @@ venv\Scripts\activate
 ### Step 4: Install Dependencies
 
 ```bash
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
-### Step 5: Configure the Model and Dataset
+### Step 5: Model and Dataset
 
-Ensure the trained MobileNetV2/SVM artifacts and any required configuration or dataset paths are available in the locations expected by the application.
+The checked-in model artifact is loaded from `models/deepfake_cnn_svm_rigorous.pkl`. The raw training dataset is not required to run inference.
 
 ### Step 6: Run the Application
 
-If your FastAPI application entry point is `main.py`:
-
 ```bash
-uvicorn main:app --reload
+python -m uvicorn app.main:app --reload
 ```
 
-Open the local application using the frontend address configured in your project.
-
-**Note:** Update the entry-point command and folder paths according to your actual repository structure.
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000). FastAPI serves both the interface and its static assets.
 
 ---
 
-## 📁 Project Structure
-
-```text
-DeepGuard-AI/
-│
-├── frontend/
-│   ├── HTML files
-│   ├── CSS files
-│   └── JavaScript files
-│
-├── backend/
-│   ├── API files
-│   └── Application logic
-│
-├── models/
-│   └── Trained model files
-│
-├── preprocessing/
-│   └── Frame and face processing
-│
-├── dataset/
-│   └── Dataset-related files
-│
-├── requirements.txt
-├── README.md
-└── .gitignore
-```
-
-*Illustrative structure: replace these entries with the actual directories and filenames in your GitHub repository.*
-
----
 
 ## ⚠️ Limitations and Responsible Use
 
@@ -345,14 +332,12 @@ Users should treat uncertain or low-quality results as requiring human review.
 
 ---
 
-## 🚀 Future Enhancements
+## 🔭 Not Yet Implemented
 
-- **Explainable Detection:** Show evidence behind an assessment using measured signals.
-- **Frame-Level Investigation:** Add an interactive video timeline with timestamps and frame-level scores.
-- **Needs Review Category:** Introduce an inconclusive category for borderline or insufficient evidence.
-- **Forensic Reports:** Include media details, analysis summaries, limitations, and model information.
-- **Model Transparency:** Present evaluation metrics, confusion matrices, and dataset scope.
-- **Improved Generalization:** Train and validate with larger and more diverse datasets.
+- Embedded metadata (such as EXIF) extraction and external provenance verification.
+- Dedicated facial-landmark, texture/pixel, blending-boundary, or lighting/shadow analysis.
+- A learned temporal model for motion and cross-frame consistency.
+- Evaluation on larger, more diverse datasets and manipulation methods.
 
 ---
 
@@ -366,24 +351,35 @@ Users should treat uncertain or low-quality results as requiring human review.
 - Nagineni Rithika
 - Penuboku Mrudhula
 - N. Devi Bhaskar
-- P. Praneeth
 
 ---
 
 ## 📚 References
 
-1. Rössler et al., *FaceForensics++: Learning to Detect Manipulated Facial Images*, ICCV 2019.
-2. Sandler et al., *MobileNetV2: Inverted Residuals and Linear Bottlenecks*, CVPR 2018.
-3. OpenCV Official Documentation.
-4. Scikit-learn Official Documentation – Support Vector Machines.
-5. FastAPI Official Documentation.
-6. FaceForensics++ Dataset.
+### Research Papers
+
+1. Rössler, A., et al. (2019). [FaceForensics++: Learning to Detect Manipulated Facial Images](https://arxiv.org/abs/1901.08971). IEEE/CVF International Conference on Computer Vision (ICCV).
+2. Sandler, M., et al. (2018). [MobileNetV2: Inverted Residuals and Linear Bottlenecks](https://openaccess.thecvf.com/content_cvpr_2018/html/Sandler_MobileNetV2_Inverted_Residuals_CVPR_2018_paper.html). IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR).
+3. Cortes, C., & Vapnik, V. (1995). [Support-Vector Networks](https://link.springer.com/article/10.1007/BF00994018). Machine Learning, 20, 273–297.
+4. Howard, A. G., et al. (2017). [MobileNets: Efficient Convolutional Neural Networks for Mobile Vision Applications](https://arxiv.org/abs/1704.04861).
+5. Viola, P., & Jones, M. (2001). [Rapid Object Detection using a Boosted Cascade of Simple Features](https://doi.org/10.1109/CVPR.2001.990517). IEEE Conference on Computer Vision and Pattern Recognition.
+6. Goodfellow, I., et al. (2014). [Generative Adversarial Nets](https://arxiv.org/abs/1406.2661). Advances in Neural Information Processing Systems (NeurIPS).
+
+### Technical Documentation
+
+7. [OpenCV Official Documentation](https://docs.opencv.org/).
+8. [Scikit-learn Official Documentation – Support Vector Machines](https://scikit-learn.org/stable/modules/svm.html).
+9. [FastAPI Official Documentation](https://fastapi.tiangolo.com/).
+
+### Dataset
+
+10. [FaceForensics++ Dataset and Project Repository](https://github.com/ondyari/FaceForensics).
 
 ---
 
 ## 📌 Project Status
 
-**Current Stage:** Working AI-assisted media analysis pipeline with an implemented application interface and preliminary evaluation results.
+**Current Stage:** Working AI-assisted media analysis pipeline with an implemented application interface, browser-local analytics/history, interactive sampled-frame investigation, HTML reports, and project-specific held-out evaluation results.
 
 **Project:** DeepGuard AI – AI-Based Deepfake Detection System
 
