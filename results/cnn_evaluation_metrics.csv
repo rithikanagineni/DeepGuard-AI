@@ -1,0 +1,2 @@
+model,accuracy,precision,recall,f1_score,train_frames,test_frames,train_videos,test_videos
+MobileNetV2 Fine-Tuned CNN,0.455,0.3875968992248062,0.625,0.4784688995215311,794,200,80,20

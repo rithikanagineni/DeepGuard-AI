@@ -1,0 +1,2 @@
+accuracy,precision,recall,f1_score,train_samples,test_samples,train_videos,test_videos
+0.39,0.3090909090909091,0.425,0.35789473684210527,794,200,80,20

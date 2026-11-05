@@ -1,0 +1,28 @@
+# Python environment
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Temporary files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+~$*
+
+# IDE
+.vscode/
+.idea/
+
+# Cache
+.pytest_cache/
+.mypy_cache/
+
+# Raw datasets (avoid uploading restricted or large datasets)
+dataset_raw/

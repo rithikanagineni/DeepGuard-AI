@@ -1,0 +1,2616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DeepGuard AI | Deepfake Detection System</title>
+
+    <link rel="stylesheet" href="/static/style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        /* =====================================================
+           ANALYTICS PAGE
+           ===================================================== */
+
+        .analytics-page {
+            padding-bottom: 40px;
+        }
+
+        .analytics-hero {
+            position: relative;
+            overflow: hidden;
+            border-radius: 24px;
+            padding: 34px;
+            margin-bottom: 28px;
+            background:
+                radial-gradient(circle at 85% 15%, rgba(109,93,252,.20), transparent 30%),
+                radial-gradient(circle at 10% 90%, rgba(65,105,225,.12), transparent 35%),
+                linear-gradient(135deg, #f8f7ff 0%, #ffffff 60%, #f5f8ff 100%);
+            border: 1px solid #e8e6f5;
+        }
+
+        .analytics-hero::after {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            border: 1px solid rgba(109,93,252,.12);
+            border-radius: 50%;
+            right: -80px;
+            top: -80px;
+        }
+
+        .analytics-hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 720px;
+        }
+
+        .analytics-hero h2 {
+            margin: 10px 0 10px;
+            font-size: 32px;
+            letter-spacing: -1px;
+        }
+
+        .analytics-hero p {
+            margin: 0;
+            color: #6f7180;
+            line-height: 1.7;
+        }
+
+        .analytics-live {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border-radius: 999px;
+            background: #ffffff;
+            border: 1px solid #e6e3f5;
+            font-size: 11px;
+            font-weight: 800;
+            color: #6757dc;
+            letter-spacing: .8px;
+        }
+
+        .analytics-live-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #20b47a;
+            box-shadow: 0 0 0 5px rgba(32,180,122,.10);
+        }
+
+        .analytics-controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .analytics-action {
+            border: 1px solid #ddd9ef;
+            background: white;
+            color: #5d5f6c;
+            border-radius: 10px;
+            padding: 10px 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .2s ease;
+        }
+
+        .analytics-action:hover {
+            border-color: #a69cf3;
+            color: #6555db;
+            transform: translateY(-1px);
+        }
+
+        .analytics-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .analytics-stat {
+            background: #fff;
+            border: 1px solid #e9e8ef;
+            border-radius: 18px;
+            padding: 21px;
+            box-shadow: 0 8px 25px rgba(34, 31, 62, .035);
+            transition: .25s ease;
+        }
+
+        .analytics-stat:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 32px rgba(34, 31, 62, .08);
+        }
+
+        .analytics-stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .analytics-stat-icon {
+            width: 40px;
+            height: 40px;
+            display: grid;
+            place-items: center;
+            border-radius: 12px;
+            background: #f1efff;
+            color: #6d5dfc;
+            font-weight: 800;
+            font-size: 18px;
+        }
+
+        .analytics-stat-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: #92939f;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+        }
+
+        .analytics-stat strong {
+            display: block;
+            font-size: 28px;
+            color: #242531;
+            margin-bottom: 4px;
+        }
+
+        .analytics-stat small {
+            color: #9697a2;
+        }
+
+        .analytics-stat.real .analytics-stat-icon {
+            background: #e9faf3;
+            color: #18a874;
+        }
+
+        .analytics-stat.fake .analytics-stat-icon {
+            background: #fff0f0;
+            color: #e35d6a;
+        }
+
+        .analytics-stat.confidence .analytics-stat-icon {
+            background: #edf5ff;
+            color: #4786dc;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.45fr;
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .analytics-card {
+            background: #fff;
+            border: 1px solid #e9e8ef;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 25px rgba(34, 31, 62, .035);
+        }
+
+        .analytics-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 22px;
+        }
+
+        .analytics-card-header span {
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: #999aa5;
+            text-transform: uppercase;
+        }
+
+        .analytics-card-header h3 {
+            margin: 5px 0 0;
+            font-size: 18px;
+            color: #272834;
+        }
+
+        .analytics-empty {
+            text-align: center;
+            padding: 45px 20px;
+            color: #9798a4;
+        }
+
+        .donut-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 28px;
+            min-height: 220px;
+        }
+
+        .donut-chart {
+            width: 165px;
+            height: 165px;
+            border-radius: 50%;
+            background: conic-gradient(
+                #6d5dfc 0deg,
+                #6d5dfc 180deg,
+                #e7e4f5 180deg,
+                #e7e4f5 360deg
+            );
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .donut-chart::after {
+            content: "";
+            position: absolute;
+            inset: 35px;
+            border-radius: 50%;
+            background: white;
+        }
+
+        .donut-center {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            z-index: 2;
+            font-size: 25px;
+            font-weight: 800;
+            color: #282936;
+        }
+
+        .legend-list {
+            display: grid;
+            gap: 16px;
+            flex: 1;
+        }
+
+        .legend-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            color: #686a77;
+            font-size: 13px;
+        }
+
+        .legend-name {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .legend-dot {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+        }
+
+        .legend-dot.real {
+            background: #6d5dfc;
+        }
+
+        .legend-dot.fake {
+            background: #e7e4f5;
+        }
+
+        .legend-row strong {
+            color: #292a36;
+        }
+
+        .confidence-chart {
+            height: 230px;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            padding: 15px 5px 0;
+            border-bottom: 1px solid #eeeeF2;
+        }
+
+        .confidence-bar-item {
+            flex: 1;
+            min-width: 12px;
+            height: 100%;
+            display: flex;
+            align-items: flex-end;
+        }
+
+        .confidence-bar-fill {
+            width: 100%;
+            min-height: 6px;
+            border-radius: 7px 7px 0 0;
+            background: linear-gradient(180deg, #7d6dff, #5f51d7);
+            transition: height .5s ease;
+        }
+
+        .confidence-chart-empty {
+            width: 100%;
+            height: 100%;
+            display: grid;
+            place-items: center;
+            color: #999aa5;
+            font-size: 13px;
+        }
+
+        .history-card {
+            background: #fff;
+            border: 1px solid #e9e8ef;
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 8px 25px rgba(34, 31, 62, .035);
+            overflow: hidden;
+        }
+
+        .history-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        .history-table th {
+            text-align: left;
+            padding: 13px 12px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .8px;
+            color: #999aa5;
+            border-bottom: 1px solid #eeeeF2;
+        }
+
+        .history-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #f2f1f5;
+            font-size: 13px;
+            color: #646672;
+        }
+
+        .history-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .history-result {
+            display: inline-flex;
+            padding: 5px 9px;
+            border-radius: 999px;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .history-result.real {
+            background: #e9faf3;
+            color: #18a874;
+        }
+
+        .history-result.fake {
+            background: #fff0f0;
+            color: #df5967;
+        }
+
+        .history-result.unknown {
+            background: #f1f1f4;
+            color: #777985;
+        }
+
+        /* =====================================================
+           METHODOLOGY PAGE
+           ===================================================== */
+
+        .methodology-page {
+            padding-bottom: 45px;
+        }
+
+        .methodology-hero {
+            position: relative;
+            overflow: hidden;
+            border-radius: 26px;
+            padding: 38px;
+            margin-bottom: 28px;
+            background:
+                radial-gradient(circle at 90% 20%, rgba(109,93,252,.25), transparent 28%),
+                radial-gradient(circle at 15% 100%, rgba(64,117,226,.13), transparent 32%),
+                linear-gradient(135deg, #17162c 0%, #252249 48%, #303064 100%);
+            color: white;
+        }
+
+        .methodology-hero::before,
+        .methodology-hero::after {
+            content: "";
+            position: absolute;
+            border: 1px solid rgba(255,255,255,.10);
+            border-radius: 50%;
+        }
+
+        .methodology-hero::before {
+            width: 330px;
+            height: 330px;
+            right: -100px;
+            top: -150px;
+        }
+
+        .methodology-hero::after {
+            width: 210px;
+            height: 210px;
+            right: 60px;
+            top: -85px;
+        }
+
+        .methodology-hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 760px;
+        }
+
+        .methodology-hero .section-label {
+            color: #aaa2ff;
+        }
+
+        .methodology-hero h2 {
+            margin: 10px 0 12px;
+            font-size: 34px;
+            letter-spacing: -1.2px;
+        }
+
+        .methodology-hero p {
+            max-width: 700px;
+            color: #c8c6da;
+            line-height: 1.75;
+            margin: 0;
+        }
+
+        .methodology-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 22px;
+        }
+
+        .methodology-badge {
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(255,255,255,.08);
+            border: 1px solid rgba(255,255,255,.10);
+            font-size: 11px;
+            font-weight: 700;
+            color: #e1def5;
+        }
+
+        .methodology-section-title {
+            margin: 34px 0 18px;
+        }
+
+        .methodology-section-title .section-label {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .methodology-section-title h3 {
+            margin: 0;
+            font-size: 23px;
+        }
+
+        .pipeline-visual {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0;
+            margin-bottom: 28px;
+        }
+
+        .pipeline-node {
+            position: relative;
+            padding: 23px 17px;
+            background: white;
+            border: 1px solid #e7e6ee;
+            min-height: 190px;
+        }
+
+        .pipeline-node:first-child {
+            border-radius: 18px 0 0 18px;
+        }
+
+        .pipeline-node:last-child {
+            border-radius: 0 18px 18px 0;
+        }
+
+        .pipeline-node:not(:last-child)::after {
+            content: "→";
+            position: absolute;
+            right: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            display: grid;
+            place-items: center;
+            background: #6d5dfc;
+            color: white;
+            border-radius: 50%;
+            z-index: 3;
+            font-size: 12px;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(109,93,252,.25);
+        }
+
+        .pipeline-node-number {
+            width: 34px;
+            height: 34px;
+            display: grid;
+            place-items: center;
+            border-radius: 10px;
+            background: #f0edff;
+            color: #6656dc;
+            font-size: 11px;
+            font-weight: 800;
+            margin-bottom: 17px;
+        }
+
+        .pipeline-node h4 {
+            margin: 0 0 8px;
+            font-size: 15px;
+            color: #292a36;
+        }
+
+        .pipeline-node p {
+            margin: 0;
+            color: #81828e;
+            font-size: 12px;
+            line-height: 1.65;
+        }
+
+        .method-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .method-detail-card {
+            background: white;
+            border: 1px solid #e8e7ef;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(34,31,62,.035);
+        }
+
+        .method-detail-top {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            margin-bottom: 18px;
+        }
+
+        .method-detail-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 13px;
+            display: grid;
+            place-items: center;
+            background: #f1efff;
+            color: #6757dd;
+            font-weight: 800;
+            font-size: 17px;
+        }
+
+        .method-detail-card h3 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        .method-detail-card p {
+            color: #727480;
+            line-height: 1.7;
+            font-size: 13px;
+            margin: 0 0 16px;
+        }
+
+        .tech-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tech-chip {
+            padding: 7px 10px;
+            border-radius: 8px;
+            background: #f7f7fa;
+            border: 1px solid #ecebf1;
+            color: #666875;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        .architecture-card {
+            background: linear-gradient(135deg, #f8f7ff, #ffffff);
+            border: 1px solid #e4e2f2;
+            border-radius: 22px;
+            padding: 28px;
+            margin-bottom: 28px;
+        }
+
+        .architecture-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+        }
+
+        .architecture-box {
+            min-width: 145px;
+            text-align: center;
+            padding: 18px 15px;
+            background: white;
+            border: 1px solid #e2e0ec;
+            border-radius: 14px;
+            box-shadow: 0 8px 20px rgba(35,32,65,.045);
+        }
+
+        .architecture-box strong {
+            display: block;
+            font-size: 13px;
+            color: #2b2c38;
+            margin-bottom: 5px;
+        }
+
+        .architecture-box span {
+            font-size: 10px;
+            color: #888995;
+        }
+
+        .architecture-arrow {
+            color: #7567e9;
+            font-weight: 800;
+            font-size: 20px;
+        }
+
+        .performance-method-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 22px;
+            padding: 28px;
+            background: linear-gradient(135deg, #201d3c, #342e68);
+            color: white;
+        }
+
+        .performance-method-card .section-label {
+            color: #aaa3ff;
+        }
+
+        .performance-method-card h3 {
+            margin: 6px 0 7px;
+            font-size: 22px;
+        }
+
+        .performance-method-card > p {
+            color: #c5c2d9;
+            margin: 0 0 24px;
+        }
+
+        .performance-method-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        .performance-method-item {
+            padding: 18px;
+            border-radius: 15px;
+            background: rgba(255,255,255,.07);
+            border: 1px solid rgba(255,255,255,.08);
+        }
+
+        .performance-method-item strong {
+            display: block;
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        .performance-method-item span {
+            font-size: 10px;
+            color: #c6c3d8;
+            text-transform: uppercase;
+            letter-spacing: .7px;
+            font-weight: 700;
+        }
+
+        .responsible-method {
+            margin-top: 18px;
+            padding: 18px;
+            border-radius: 15px;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.08);
+            color: #d0cde0;
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 1100px) {
+
+            .analytics-stat-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .pipeline-visual {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .pipeline-node,
+            .pipeline-node:first-child,
+            .pipeline-node:last-child {
+                border-radius: 16px;
+            }
+
+            .pipeline-node:not(:last-child)::after {
+                content: "↓";
+                right: 50%;
+                top: auto;
+                bottom: -17px;
+                transform: translateX(50%);
+            }
+        }
+
+        @media (max-width: 760px) {
+
+            .analytics-stat-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .method-detail-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .performance-method-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .methodology-hero,
+            .analytics-hero {
+                padding: 25px;
+            }
+
+            .methodology-hero h2,
+            .analytics-hero h2 {
+                font-size: 26px;
+            }
+
+            .donut-wrapper {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="app">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                <span>◈</span>
+            </div>
+
+            <div>
+                <h1>DeepGuard</h1>
+                <p>AI Forensic Lab</p>
+            </div>
+
+        </div>
+
+        <nav class="navigation">
+
+            <button class="nav-item active" data-section="dashboard">
+                <span class="nav-icon">⌂</span>
+                <span>Dashboard</span>
+            </button>
+
+            <button class="nav-item" data-section="analyzer">
+                <span class="nav-icon">◉</span>
+                <span>Media Analyzer</span>
+            </button>
+
+            <button class="nav-item" data-section="analytics">
+                <span class="nav-icon">◫</span>
+                <span>Analytics</span>
+            </button>
+
+            <button class="nav-item" data-section="methodology">
+                <span class="nav-icon">◇</span>
+                <span>Methodology</span>
+            </button>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="model-status">
+
+                <span class="status-dot"></span>
+
+                <div>
+                    <strong>AI Model Online</strong>
+                    <small>CNN + RBF SVM</small>
+                </div>
+
+            </div>
+
+            <div class="sidebar-version">
+                DeepGuard v1.0
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div class="mobile-brand">
+                <strong>DeepGuard</strong>
+            </div>
+
+            <div class="topbar-right">
+
+                <div class="system-pill">
+                    <span class="pulse"></span>
+                    System Operational
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- =====================================================
+             DASHBOARD
+             ===================================================== -->
+
+        <section id="dashboard" class="page-section active">
+
+            <div class="hero">
+
+                <div class="hero-content">
+
+                    <div class="eyebrow">
+                        <span>✦</span>
+                        AI-POWERED MEDIA FORENSICS
+                    </div>
+
+                    <h2>
+                        Detect manipulated media
+                        <span>with AI.</span>
+                    </h2>
+
+                    <p>
+                        Analyze images and videos for signs of deepfake
+                        manipulation using CNN-based feature extraction
+                        and an RBF Support Vector Machine classifier.
+                    </p>
+
+                    <button class="primary-button" id="heroAnalyzeBtn">
+                        Analyze Media
+                        <span>→</span>
+                    </button>
+
+                </div>
+
+                <div class="hero-visual">
+
+                    <div class="orb orb-one"></div>
+                    <div class="orb orb-two"></div>
+
+                    <div class="scan-card">
+
+                        <div class="scan-header">
+
+                            <div class="scan-title">
+                                <span class="scan-dot"></span>
+                                LIVE AI ANALYSIS
+                            </div>
+
+                            <span class="scan-code">
+                                DG-01
+                            </span>
+
+                        </div>
+
+                        <div class="scan-face">
+
+                            <div class="face-grid"></div>
+
+                            <div class="face-circle">
+
+                                <div class="face-placeholder">
+                                    ◉
+                                </div>
+
+                            </div>
+
+                            <div class="scan-line"></div>
+
+                        </div>
+
+                        <div class="scan-footer">
+
+                            <div>
+                                <small>MODEL</small>
+                                <strong>CNN + SVM</strong>
+                            </div>
+
+                            <div>
+                                <small>INPUT</small>
+                                <strong>IMAGE / VIDEO</strong>
+                            </div>
+
+                            <div>
+                                <small>STATUS</small>
+                                <strong class="online">READY</strong>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="section-heading">
+
+                <div>
+                    <span class="section-label">
+                        SYSTEM OVERVIEW
+                    </span>
+
+                    <h3>Detection Pipeline</h3>
+                </div>
+
+            </div>
+
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+
+                    <div class="stat-icon purple">
+                        ◎
+                    </div>
+
+                    <div>
+                        <span class="stat-title">
+                            Feature Extractor
+                        </span>
+
+                        <strong>
+                            MobileNetV2
+                        </strong>
+
+                        <small>
+                            1280-dimensional features
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon blue">
+                        ◇
+                    </div>
+
+                    <div>
+                        <span class="stat-title">
+                            Classifier
+                        </span>
+
+                        <strong>
+                            RBF SVM
+                        </strong>
+
+                        <small>
+                            Balanced binary classifier
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon violet">
+                        ◌
+                    </div>
+
+                    <div>
+                        <span class="stat-title">
+                            Video Analysis
+                        </span>
+
+                        <strong>
+                            20 Frames
+                        </strong>
+
+                        <small>
+                            Face-aware frame sampling
+                        </small>
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-icon cyan">
+                        ✓
+                    </div>
+
+                    <div>
+                        <span class="stat-title">
+                            Test Performance
+                        </span>
+
+                        <strong>
+                            70%
+                        </strong>
+
+                        <small>
+                            Held-out video test accuracy
+                        </small>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="section-heading process-heading">
+
+                <div>
+                    <span class="section-label">
+                        HOW IT WORKS
+                    </span>
+
+                    <h3>
+                        From media to detection
+                    </h3>
+                </div>
+
+            </div>
+
+
+            <div class="process-grid">
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        01
+                    </div>
+
+                    <div class="process-icon">
+                        ↑
+                    </div>
+
+                    <h4>
+                        Upload Media
+                    </h4>
+
+                    <p>
+                        Upload an image or video containing
+                        facial content for analysis.
+                    </p>
+
+                </div>
+
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        02
+                    </div>
+
+                    <div class="process-icon">
+                        ⌕
+                    </div>
+
+                    <h4>
+                        Detect Face
+                    </h4>
+
+                    <p>
+                        Facial regions are identified and
+                        normalized before classification.
+                    </p>
+
+                </div>
+
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        03
+                    </div>
+
+                    <div class="process-icon">
+                        ✦
+                    </div>
+
+                    <h4>
+                        Extract Features
+                    </h4>
+
+                    <p>
+                        CNN-based feature extraction captures
+                        visual patterns from the media.
+                    </p>
+
+                </div>
+
+
+                <div class="process-card">
+
+                    <div class="process-number">
+                        04
+                    </div>
+
+                    <div class="process-icon">
+                        ✓
+                    </div>
+
+                    <h4>
+                        Classify
+                    </h4>
+
+                    <p>
+                        The RBF SVM determines whether the
+                        media is classified as Real or Fake.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             MEDIA ANALYZER
+             ===================================================== -->
+
+        <section id="analyzer" class="page-section">
+
+            <div class="page-title">
+
+                <div>
+
+                    <span class="section-label">
+                        MEDIA FORENSICS
+                    </span>
+
+                    <h2>
+                        Media Analyzer
+                    </h2>
+
+                    <p>
+                        Upload an image or video to analyze its
+                        facial content using the trained AI
+                        detection pipeline.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="analyzer-layout">
+
+                <div class="upload-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <span class="section-label">
+                                INPUT MEDIA
+                            </span>
+
+                            <h3>
+                                Select media to analyze
+                            </h3>
+
+                        </div>
+
+                        <span class="supported">
+                            IMAGE / VIDEO
+                        </span>
+
+                    </div>
+
+
+                    <div class="drop-zone" id="dropZone">
+
+                        <input
+                            type="file"
+                            id="fileInput"
+                            accept=".jpg,.jpeg,.png,.webp,.mp4,.avi,.mov,.mkv,.webm"
+                            hidden
+                        >
+
+                        <div class="upload-icon">
+                            ↑
+                        </div>
+
+                        <h3>
+                            Drop your media here
+                        </h3>
+
+                        <p>
+                            or click to browse from your computer
+                        </p>
+
+                        <span class="file-types">
+                            JPG · PNG · WEBP · MP4 · MOV · AVI · MKV
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        class="media-preview"
+                        id="mediaPreview"
+                    >
+
+                        <div class="preview-header">
+
+                            <span>
+                                MEDIA PREVIEW
+                            </span>
+
+                            <button
+                                id="previewRemove"
+                                class="preview-remove"
+                                type="button"
+                            >
+                                ×
+                            </button>
+
+                        </div>
+
+
+                        <div
+                            class="preview-container"
+                            id="previewContainer"
+                        ></div>
+
+                    </div>
+
+
+                    <div class="forensic-details" id="forensicDetails">
+
+                        <div class="forensic-details-heading">
+                            <strong>FORENSIC SNAPSHOT</strong>
+                            <span>Generated locally · not uploaded</span>
+                        </div>
+
+                        <div class="forensic-metadata">
+                            <div>
+                                <span>Dimensions</span>
+                                <strong id="mediaDimensions">—</strong>
+                            </div>
+                            <div>
+                                <span>Duration</span>
+                                <strong id="mediaDuration">—</strong>
+                            </div>
+                        </div>
+
+                        <div class="fingerprint-row">
+                            <span>SHA-256 file fingerprint</span>
+                            <code id="mediaFingerprint">—</code>
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="selected-file"
+                        id="selectedFile"
+                    >
+
+                        <div class="file-preview-icon">
+                            ◫
+                        </div>
+
+                        <div class="file-details">
+
+                            <strong id="fileName">
+                                filename
+                            </strong>
+
+                            <span id="fileSize">
+                                0 KB
+                            </span>
+
+                        </div>
+
+                        <button
+                            id="removeFile"
+                            class="remove-button"
+                            type="button"
+                        >
+                            ×
+                        </button>
+
+                    </div>
+
+
+                    <button
+                        class="analyze-button"
+                        id="analyzeButton"
+                        disabled
+                    >
+
+                        <span>
+                            Analyze with AI
+                        </span>
+
+                        <span>
+                            →
+                        </span>
+
+                    </button>
+
+                </div>
+
+
+                <!-- RESULT -->
+
+                <div class="result-panel">
+
+                    <div class="panel-header">
+
+                        <div>
+
+                            <span class="section-label">
+                                ANALYSIS RESULT
+                            </span>
+
+                            <h3>
+                                Detection Report
+                            </h3>
+
+                        </div>
+
+                        <span
+                            id="resultStatus"
+                            class="result-status"
+                        >
+                            WAITING
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        class="result-empty"
+                        id="resultEmpty"
+                    >
+
+                        <div class="empty-visual">
+
+                            <div class="empty-ring">
+                                <span>✦</span>
+                            </div>
+
+                        </div>
+
+                        <h3>
+                            Ready for analysis
+                        </h3>
+
+                        <p>
+                            Upload media and start the AI analysis
+                            to view the detection report.
+                        </p>
+
+                    </div>
+
+
+                    <div
+                        class="analysis-pipeline"
+                        id="analysisPipeline"
+                    >
+
+                        <div class="analysis-orb">
+
+                            <div class="analysis-orb-inner">
+                                AI
+                            </div>
+
+                        </div>
+
+
+                        <h3 id="pipelineTitle">
+                            Analyzing media
+                        </h3>
+
+                        <p id="pipelineDescription">
+                            Preparing the AI detection pipeline...
+                        </p>
+
+
+                        <div class="pipeline-steps">
+
+                            <div
+                                class="pipeline-step"
+                                id="stepFace"
+                            >
+
+                                <div class="pipeline-step-icon">
+                                    01
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        Face Detection
+                                    </strong>
+
+                                    <small>
+                                        Locating facial regions
+                                    </small>
+                                </div>
+
+                                <span class="step-check">
+                                    ✓
+                                </span>
+
+                            </div>
+
+
+                            <div
+                                class="pipeline-step"
+                                id="stepCNN"
+                            >
+
+                                <div class="pipeline-step-icon">
+                                    02
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        CNN Features
+                                    </strong>
+
+                                    <small>
+                                        Extracting visual patterns
+                                    </small>
+                                </div>
+
+                                <span class="step-check">
+                                    ✓
+                                </span>
+
+                            </div>
+
+
+                            <div
+                                class="pipeline-step"
+                                id="stepSVM"
+                            >
+
+                                <div class="pipeline-step-icon">
+                                    03
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        SVM Classification
+                                    </strong>
+
+                                    <small>
+                                        Evaluating authenticity
+                                    </small>
+                                </div>
+
+                                <span class="step-check">
+                                    ✓
+                                </span>
+
+                            </div>
+
+
+                            <div
+                                class="pipeline-step"
+                                id="stepFinal"
+                            >
+
+                                <div class="pipeline-step-icon">
+                                    04
+                                </div>
+
+                                <div>
+                                    <strong>
+                                        Final Decision
+                                    </strong>
+
+                                    <small>
+                                        Aggregating analysis
+                                    </small>
+                                </div>
+
+                                <span class="step-check">
+                                    ✓
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="pipeline-progress">
+                            <div id="pipelineProgressBar"></div>
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="result-content"
+                        id="resultContent"
+                    >
+
+                        <div class="result-main">
+
+                            <div
+                                class="result-badge"
+                                id="resultBadge"
+                            >
+
+                                <span id="resultBadgeIcon">
+                                    ✓
+                                </span>
+
+                            </div>
+
+
+                            <div>
+
+                                <span class="result-caption">
+                                        AI-ASSISTED ASSESSMENT
+                                </span>
+
+                                <h2 id="resultLabel">
+                                    Real
+                                </h2>
+
+                                <p id="resultMessage">
+                                    Analysis completed successfully.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="confidence-section">
+
+                            <div class="confidence-header">
+
+                                <span>
+                                    Fake-class Model Score
+                                </span>
+
+                                <strong id="confidenceValue">
+                                    0%
+                                </strong>
+
+                            </div>
+
+
+                            <div class="confidence-bar">
+
+                                <div id="confidenceBar"></div>
+
+                            </div>
+
+
+                            <small>
+                                Bounded Fake-class score derived from the SVM decision function; not a calibrated probability. Scores at or above 50 indicate the Fake class.
+                            </small>
+
+                        </div>
+
+
+                        <div
+                            class="video-stats"
+                            id="videoStats"
+                        >
+
+                            <div class="mini-stat">
+
+                                <span>
+                                    Frames analyzed
+                                </span>
+
+                                <strong id="framesAnalyzed">
+                                    —
+                                </strong>
+
+                            </div>
+
+
+                            <div class="mini-stat">
+
+                                <span>
+                                    Face detection
+                                </span>
+
+                                <strong id="faceDetection">
+                                    —
+                                </strong>
+
+                            </div>
+
+
+                            <div class="mini-stat">
+
+                                <span>
+                                    Real frames
+                                </span>
+
+                                <strong id="realFrames">
+                                    —
+                                </strong>
+
+                            </div>
+
+
+                            <div class="mini-stat">
+
+                                <span>
+                                    Fake frames
+                                </span>
+
+                                <strong id="fakeFrames">
+                                    —
+                                </strong>
+
+                            </div>
+
+                            <div class="mini-stat">
+                                <span>Needs review</span>
+                                <strong id="reviewFrames">—</strong>
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="frame-distribution"
+                            id="frameDistribution"
+                        >
+
+                            <div class="distribution-header">
+
+                                <span>
+                                    FRAME CLASSIFICATION
+                                </span>
+
+                                <strong id="fakePercentage">
+                                    0% Fake
+                                </strong>
+
+                            </div>
+
+
+                            <div class="distribution-bar">
+
+                                <div
+                                    class="real-part"
+                                    id="realPart"
+                                ></div>
+
+                                <div
+                                    class="fake-part"
+                                    id="fakePart"
+                                ></div>
+
+                                <div
+                                    class="review-part"
+                                    id="reviewPart"
+                                ></div>
+
+                            </div>
+
+
+                            <div class="distribution-legend">
+
+                                <span>
+                                    <i class="real-dot"></i>
+                                    Real
+                                </span>
+
+                                <span>
+                                    <i class="fake-dot"></i>
+                                    Fake
+                                </span>
+
+                                <span>
+                                    <i class="review-dot"></i>
+                                    Needs Review
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="forensic-result-sections"
+                            id="forensicResultSections"
+                        >
+
+                            <details class="result-disclosure" open>
+                                <summary>Why this result?</summary>
+                                <div class="disclosure-content">
+                                    <p id="reviewReason" class="review-reason" hidden></p>
+                                    <div class="evidence-grid">
+                                        <div><span>Face detection</span><strong id="evidenceFace">Not available</strong></div>
+                                        <div><span>Facial crop + CNN features</span><strong id="evidenceCNN">Not available</strong></div>
+                                        <div><span>SVM classification</span><strong id="evidenceSVM">Not available</strong></div>
+                                        <div><span>Sampled-frame agreement</span><strong id="evidenceAgreement">Not available</strong></div>
+                                        <div><span>Temporal motion consistency</span><strong>Not analyzed</strong></div>
+                                        <div><span>Texture / blending / lighting</span><strong>Not analyzed</strong></div>
+                                        <div><span>Metadata / provenance</span><strong>Not analyzed</strong></div>
+                                    </div>
+                                    <div class="evidence-strength-grid">
+                                        <div><span>Face coverage</span><strong id="strengthFace">Not available</strong></div>
+                                        <div><span>Frame agreement</span><strong id="strengthAgreement">Not available</strong></div>
+                                        <div><span>Overall evidence coverage</span><strong id="strengthOverall">Not available</strong></div>
+                                    </div>
+                                    <small class="forensic-disclaimer">Evidence coverage is a transparent summary of available signals, not a calibrated measure of truth.</small>
+                                </div>
+                            </details>
+
+                            <details class="result-disclosure" id="frameInvestigationSection">
+                                <summary>Frame Investigation</summary>
+                                <div class="disclosure-content">
+                                    <p class="forensic-disclaimer">The existing sampling strategy evaluates at most 20 evenly spaced frames. Frame scores are bounded Fake-class SVM scores, not probabilities; suspicion labels reflect only this score band.</p>
+                                    <div class="frame-timeline" id="frameTimeline"></div>
+                                    <div class="frame-inspection" id="frameInspection" hidden>
+                                        <div>
+                                            <span>Sampled frame</span>
+                                            <img id="investigatedFrameImage" alt="Selected sampled video frame">
+                                        </div>
+                                        <div>
+                                            <span>Detected face crop</span>
+                                            <img id="investigatedFaceImage" alt="Face crop from selected frame">
+                                        </div>
+                                        <p id="investigatedFrameSummary"></p>
+                                    </div>
+                                </div>
+                            </details>
+
+                            <details class="result-disclosure">
+                                <summary>Media Forensics</summary>
+                                <div class="disclosure-content">
+                                    <div class="forensic-info-grid">
+                                        <div><span>File name</span><strong id="resultFileName">Not available</strong></div>
+                                        <div><span>Media type</span><strong id="resultMediaType">Not available</strong></div>
+                                        <div><span>File size</span><strong id="resultFileSize">Not available</strong></div>
+                                        <div><span>Resolution</span><strong id="resultResolution">Not available</strong></div>
+                                        <div><span>Duration</span><strong id="resultDuration">Not available</strong></div>
+                                        <div><span>FPS</span><strong id="resultFps">Not available</strong></div>
+                                        <div><span>Frames analyzed</span><strong id="resultFramesAnalyzed">Not available</strong></div>
+                                        <div><span>Frames with detected faces</span><strong id="resultFacesDetected">Not available</strong></div>
+                                        <div><span>Real-like frames</span><strong id="resultRealFrames">Not available</strong></div>
+                                        <div><span>Fake-like frames</span><strong id="resultFakeFrames">Not available</strong></div>
+                                        <div><span>Suspicious frames</span><strong id="resultSuspiciousFrames">Not available</strong></div>
+                                        <div><span>Median model score</span><strong id="resultMedianScore">Not available</strong></div>
+                                        <div><span>Final assessment</span><strong id="resultFinalAssessment">Not available</strong></div>
+                                        <div class="forensic-info-wide"><span>SHA-256 file fingerprint</span><code id="resultFingerprint">Not available</code></div>
+                                        <div class="forensic-info-wide"><span>Embedded metadata / provenance</span><strong>Not analyzed</strong></div>
+                                    </div>
+                                    <p class="forensic-disclaimer">Metadata can provide useful context but does not by itself prove whether media is authentic.</p>
+                                </div>
+                            </details>
+
+                            <details class="result-disclosure">
+                                <summary>Model Information &amp; Limitations</summary>
+                                <div class="disclosure-content model-limitations">
+                                    <p><strong>Feature extractor:</strong> MobileNetV2 (ImageNet weights, pooled CNN features)</p>
+                                    <p><strong>Classifier:</strong> SVM; the displayed bounded score is derived from its decision function and is not a calibrated probability.</p>
+                                    <p><strong>Development dataset:</strong> FaceForensics++ subset used by this project.</p>
+                                    <p>DeepGuard AI provides an AI-assisted assessment and should not be treated as absolute proof of authenticity or manipulation. Results may be affected by video quality, compression, lighting, face visibility, dataset characteristics, and unseen manipulation techniques.</p>
+                                </div>
+                            </details>
+
+                        </div>
+
+
+                        <div class="analysis-note">
+
+                            <span>
+                                ⓘ
+                            </span>
+
+                            <p id="analysisNote">
+                                This result is an AI classification
+                                and should be interpreted as an
+                                automated screening result rather
+                                than definitive forensic proof.
+                            </p>
+
+                        </div>
+
+
+                        <div class="result-actions">
+
+                            <button
+                                class="secondary-button"
+                                id="tryAgainButton"
+                                type="button"
+                            >
+                                Try Again
+                            </button>
+
+                            <button
+                                class="primary-button"
+                                id="downloadReportButton"
+                                type="button"
+                            >
+                                Download Report
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <div
+                        class="result-error"
+                        id="resultError"
+                    >
+
+                        <div class="error-icon">
+                            !
+                        </div>
+
+                        <h3 id="errorTitle">
+                            Analysis unavailable
+                        </h3>
+
+                        <p id="errorMessage">
+                            Something went wrong while processing
+                            the media.
+                        </p>
+
+                        <button
+                            class="secondary-button"
+                            id="errorTryAgainButton"
+                            type="button"
+                        >
+                            Try Again
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             ANALYTICS
+             ===================================================== -->
+
+        <section
+            id="analytics"
+            class="page-section analytics-page"
+        >
+
+            <div id="analyticsContent"></div>
+
+        </section>
+
+
+        <!-- =====================================================
+             METHODOLOGY
+             ===================================================== -->
+
+        <section
+            id="methodology"
+            class="page-section methodology-page"
+        >
+
+            <div class="methodology-hero">
+
+                <div class="methodology-hero-content">
+
+                    <span class="section-label">
+                        PROJECT METHODOLOGY
+                    </span>
+
+                    <h2>
+                        Inside the DeepGuard AI Detection Engine
+                    </h2>
+
+                    <p>
+                        DeepGuard combines computer vision, deep learning
+                        feature extraction and classical machine learning
+                        to analyze facial media and classify it as Real or
+                        Fake.
+                    </p>
+
+                    <div class="methodology-badges">
+
+                        <span class="methodology-badge">
+                            Computer Vision
+                        </span>
+
+                        <span class="methodology-badge">
+                            MobileNetV2
+                        </span>
+
+                        <span class="methodology-badge">
+                            CNN Features
+                        </span>
+
+                        <span class="methodology-badge">
+                            RBF SVM
+                        </span>
+
+                        <span class="methodology-badge">
+                            OpenCV
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="methodology-section-title">
+
+                <span class="section-label">
+                    END-TO-END PIPELINE
+                </span>
+
+                <h3>
+                    From raw media to forensic screening
+                </h3>
+
+            </div>
+
+
+            <div class="pipeline-visual">
+
+                <div class="pipeline-node">
+
+                    <div class="pipeline-node-number">
+                        01
+                    </div>
+
+                    <h4>
+                        Data Collection
+                    </h4>
+
+                    <p>
+                        Real and manipulated video samples are
+                        collected for model development and testing.
+                    </p>
+
+                </div>
+
+
+                <div class="pipeline-node">
+
+                    <div class="pipeline-node-number">
+                        02
+                    </div>
+
+                    <h4>
+                        Preprocessing
+                    </h4>
+
+                    <p>
+                        Frames are sampled, faces are detected,
+                        resized to 224×224 and normalized.
+                    </p>
+
+                </div>
+
+
+                <div class="pipeline-node">
+
+                    <div class="pipeline-node-number">
+                        03
+                    </div>
+
+                    <h4>
+                        Feature Extraction
+                    </h4>
+
+                    <p>
+                        MobileNetV2 converts facial regions into
+                        1280-dimensional visual representations.
+                    </p>
+
+                </div>
+
+
+                <div class="pipeline-node">
+
+                    <div class="pipeline-node-number">
+                        04
+                    </div>
+
+                    <h4>
+                        SVM Classification
+                    </h4>
+
+                    <p>
+                        An RBF-kernel SVM evaluates extracted
+                        features for Real/Fake classification.
+                    </p>
+
+                </div>
+
+
+                <div class="pipeline-node">
+
+                    <div class="pipeline-node-number">
+                        05
+                    </div>
+
+                    <h4>
+                        Final Decision
+                    </h4>
+
+                    <p>
+                        Frame-level evidence is aggregated to
+                        produce the video-level prediction.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="methodology-section-title">
+
+                <span class="section-label">
+                    TECHNICAL BREAKDOWN
+                </span>
+
+                <h3>
+                    What happens inside each stage?
+                </h3>
+
+            </div>
+
+
+            <div class="method-detail-grid">
+
+                <div class="method-detail-card">
+
+                    <div class="method-detail-top">
+
+                        <div class="method-detail-icon">
+                            01
+                        </div>
+
+                        <div>
+                            <h3>
+                                Media Preprocessing
+                            </h3>
+                        </div>
+
+                    </div>
+
+                    <p>
+                        Videos are sampled at evenly distributed
+                        positions. A Haar Cascade face detector
+                        identifies facial regions. The largest detected
+                        face is selected, resized to 224×224 pixels and
+                        normalized for neural-network processing.
+                    </p>
+
+                    <div class="tech-list">
+
+                        <span class="tech-chip">
+                            OpenCV
+                        </span>
+
+                        <span class="tech-chip">
+                            Haar Cascade
+                        </span>
+
+                        <span class="tech-chip">
+                            224 × 224
+                        </span>
+
+                        <span class="tech-chip">
+                            Normalization
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="method-detail-card">
+
+                    <div class="method-detail-top">
+
+                        <div class="method-detail-icon">
+                            02
+                        </div>
+
+                        <div>
+                            <h3>
+                                CNN Feature Extraction
+                            </h3>
+                        </div>
+
+                    </div>
+
+                    <p>
+                        A pretrained MobileNetV2 backbone is used as
+                        the visual feature extractor. Instead of directly
+                        using its final classification layer, the system
+                        produces a compact 1280-dimensional feature
+                        representation for each processed face.
+                    </p>
+
+                    <div class="tech-list">
+
+                        <span class="tech-chip">
+                            MobileNetV2
+                        </span>
+
+                        <span class="tech-chip">
+                            TensorFlow / Keras
+                        </span>
+
+                        <span class="tech-chip">
+                            1280 Features
+                        </span>
+
+                        <span class="tech-chip">
+                            Transfer Learning
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="method-detail-card">
+
+                    <div class="method-detail-top">
+
+                        <div class="method-detail-icon">
+                            03
+                        </div>
+
+                        <div>
+                            <h3>
+                                SVM Classification
+                            </h3>
+                        </div>
+
+                    </div>
+
+                    <p>
+                        The extracted CNN representations are passed
+                        into an RBF-kernel Support Vector Machine.
+                        The classifier learns a decision boundary between
+                        real and manipulated facial media.
+                    </p>
+
+                    <div class="tech-list">
+
+                        <span class="tech-chip">
+                            Scikit-learn
+                        </span>
+
+                        <span class="tech-chip">
+                            RBF Kernel
+                        </span>
+
+                        <span class="tech-chip">
+                            Binary Classification
+                        </span>
+
+                        <span class="tech-chip">
+                            CNN + SVM
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="method-detail-card">
+
+                    <div class="method-detail-top">
+
+                        <div class="method-detail-icon">
+                            04
+                        </div>
+
+                        <div>
+                            <h3>
+                                Video-Level Analysis
+                            </h3>
+                        </div>
+
+                    </div>
+
+                    <p>
+                        For video inputs, multiple frames are analyzed
+                        independently. Facial detections and frame-level
+                        predictions are aggregated to produce the final
+                        video-level Real/Fake result.
+                    </p>
+
+                    <div class="tech-list">
+
+                        <span class="tech-chip">
+                            20 Frames
+                        </span>
+
+                        <span class="tech-chip">
+                            Face-Aware Sampling
+                        </span>
+
+                        <span class="tech-chip">
+                            Frame Aggregation
+                        </span>
+
+                        <span class="tech-chip">
+                            Video Decision
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="architecture-card">
+
+                <div
+                    class="methodology-section-title"
+                    style="margin-top:0;"
+                >
+
+                    <span class="section-label">
+                        MODEL ARCHITECTURE
+                    </span>
+
+                    <h3>
+                        CNN feature extractor + RBF SVM
+                    </h3>
+
+                </div>
+
+
+                <div class="architecture-flow">
+
+                    <div class="architecture-box">
+                        <strong>Image / Video</strong>
+                        <span>User Input</span>
+                    </div>
+
+                    <div class="architecture-arrow">
+                        →
+                    </div>
+
+                    <div class="architecture-box">
+                        <strong>Face Detection</strong>
+                        <span>Haar Cascade</span>
+                    </div>
+
+                    <div class="architecture-arrow">
+                        →
+                    </div>
+
+                    <div class="architecture-box">
+                        <strong>MobileNetV2</strong>
+                        <span>1280-D Features</span>
+                    </div>
+
+                    <div class="architecture-arrow">
+                        →
+                    </div>
+
+                    <div class="architecture-box">
+                        <strong>RBF SVM</strong>
+                        <span>Classification</span>
+                    </div>
+
+                    <div class="architecture-arrow">
+                        →
+                    </div>
+
+                    <div class="architecture-box">
+                        <strong>REAL / FAKE</strong>
+                        <span>Final Output</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="methodology-section-title">
+
+                <span class="section-label">
+                    EXPERIMENT SETUP
+                </span>
+
+                <h3>
+                    Dataset and evaluation
+                </h3>
+
+            </div>
+
+
+            <div class="method-detail-grid">
+
+                <div class="method-detail-card">
+
+                    <div class="method-detail-top">
+
+                        <div class="method-detail-icon">
+                            DS
+                        </div>
+
+                        <div>
+                            <h3>
+                                FaceForensics++ Data
+                            </h3>
+                        </div>
+
+                    </div>
+
+                    <p>
+                        The implemented experiment uses original YouTube
+                        sequences together with manipulated Deepfakes
+                        sequences. The current working dataset contains
+                        50 real videos and 50 fake videos.
+                    </p>
+
+                    <div class="tech-list">
+
+                        <span class="tech-chip">
+                            50 Real
+                        </span>
+
+                        <span class="tech-chip">
+                            50 Fake
+                        </span>
+
+                        <span class="tech-chip">
+                            Deepfakes
+                        </span>
+
+                        <span class="tech-chip">
+                            c40
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="method-detail-card">
+
+                    <div class="method-detail-top">
+
+                        <div class="method-detail-icon">
+                            EV
+                        </div>
+
+                        <div>
+                            <h3>
+                                Held-Out Evaluation
+                            </h3>
+                        </div>
+
+                    </div>
+
+                    <p>
+                        Evaluation is performed using a held-out video-level
+                        test set. The reported metrics represent the final
+                        test performance of the CNN feature extraction +
+                        RBF SVM pipeline.
+                    </p>
+
+                    <div class="tech-list">
+
+                        <span class="tech-chip">
+                            Video-Level Test
+                        </span>
+
+                        <span class="tech-chip">
+                            Accuracy
+                        </span>
+
+                        <span class="tech-chip">
+                            Precision
+                        </span>
+
+                        <span class="tech-chip">
+                            Recall
+                        </span>
+
+                        <span class="tech-chip">
+                            F1 Score
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="performance-method-card">
+
+                <span class="section-label">
+                    HELD-OUT VIDEO TEST
+                </span>
+
+                <h3>
+                    DeepGuard AI model performance
+                </h3>
+
+                <p>
+                    CNN feature extraction + RBF SVM on the held-out
+                    video-level test set.
+                </p>
+
+
+                <div class="performance-method-grid">
+
+                    <div class="performance-method-item">
+                        <strong>70%</strong>
+                        <span>Accuracy</span>
+                    </div>
+
+                    <div class="performance-method-item">
+                        <strong>70%</strong>
+                        <span>Precision</span>
+                    </div>
+
+                    <div class="performance-method-item">
+                        <strong>70%</strong>
+                        <span>Recall</span>
+                    </div>
+
+                    <div class="performance-method-item">
+                        <strong>70%</strong>
+                        <span>F1 Score</span>
+                    </div>
+
+                </div>
+
+                <p class="evaluation-source-note">
+                    Evaluation performed on the held-out test set. These are project-specific results, not universal accuracy.
+                </p>
+
+                <div class="confusion-matrix-wrap">
+                    <strong>Video-level confusion matrix</strong>
+                    <table class="confusion-matrix">
+                        <thead>
+                            <tr>
+                                <th scope="col">Actual \ Predicted</th>
+                                <th scope="col">Real</th>
+                                <th scope="col">Fake</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">Real</th>
+                                <td>7 · True Real</td>
+                                <td>3 · False Fake</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Fake</th>
+                                <td>3 · False Real</td>
+                                <td>7 · True Fake</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <div class="responsible-method">
+
+                    <strong>
+                        Responsible AI note:
+                    </strong>
+
+                    These metrics describe performance on the project's
+                    held-out test set. They should not be interpreted as
+                    proof that the system can detect every type of
+                    deepfake in real-world media. Detection output is
+                    intended as an automated screening result rather
+                    than definitive forensic proof.
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= FOOTER ================= -->
+
+        <footer>
+
+            <div>
+                <strong>
+                    DeepGuard AI
+                </strong>
+
+                <span>
+                    AI-Based Deepfake Detection System
+                </span>
+            </div>
+
+            <span>
+                CNN Feature Extraction · RBF SVM · OpenCV
+            </span>
+
+        </footer>
+
+    </main>
+
+</div>
+
+
+<script src="/static/app.js"></script>
+
+</body>
+</html>

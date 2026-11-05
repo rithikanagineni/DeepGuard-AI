@@ -1,0 +1,2 @@
+model,accuracy,precision,recall,f1_score,train_frames,test_frames,train_videos,test_videos
+RBF_C10_GAMMA_LARGE,0.4,0.4,1.0,0.5714285714285714,794,200,80,20
